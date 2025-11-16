@@ -7,12 +7,15 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { OptimistServer } from './server.js';
+import { PerformanceAnalyzer } from './tools/performance.js';
 
 /**
  * Main entry point for the Optimist MCP server
  */
 async function main() {
   const optimist = new OptimistServer();
+  const performanceAnalyzer = new PerformanceAnalyzer();
+  
   const server = new Server(
     {
       name: optimist.name,
@@ -36,15 +39,34 @@ async function main() {
     const { name, arguments: args } = request.params;
 
     try {
-      // Tool implementations will be added in future TDD cycles
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Tool '${name}' implementation pending. Arguments received: ${JSON.stringify(args, null, 2)}`,
-          },
-        ],
-      };
+      switch (name) {
+        case 'analyze_performance': {
+          const path = (args as any).path;
+          if (!path) {
+            throw new Error('Missing required argument: path');
+          }
+          const result = await performanceAnalyzer.analyze(path);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        }
+
+        default:
+          // Tool implementations will be added in future TDD cycles
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Tool '${name}' implementation pending. Arguments received: ${JSON.stringify(args, null, 2)}`,
+              },
+            ],
+          };
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       return {
