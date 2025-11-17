@@ -14,17 +14,14 @@ export class CodeSmellDetector {
   /**
    * Analyze a file for code smells
    */
-  async analyze(
-    filePath: string,
-    options: { severity?: string } = {}
-  ): Promise<AnalysisResult> {
+  async analyze(filePath: string, options: { severity?: string } = {}): Promise<AnalysisResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
 
     try {
       const analysis = this.analyzer.analyzeSmells(filePath);
-      
+
       // Process all smell types
       const allSmells = [
         ...analysis.godObjects,
@@ -36,11 +33,11 @@ export class CodeSmellDetector {
 
       // Filter by severity if specified
       const filteredSmells = options.severity
-        ? allSmells.filter(smell => this.matchesSeverity(smell.severity, options.severity!))
+        ? allSmells.filter((smell) => this.matchesSeverity(smell.severity, options.severity!))
         : allSmells;
 
       // Convert smells to findings
-      filteredSmells.forEach(smell => {
+      filteredSmells.forEach((smell) => {
         findings.push({
           type: smell.type,
           severity: smell.severity,
@@ -126,8 +123,10 @@ export class CodeSmellDetector {
         return {
           type: 'SPLIT_RESPONSIBILITIES',
           priority: 'high',
-          description: 'Split class into smaller, focused classes following Single Responsibility Principle',
-          example: '// Instead of one UserManager:\nclass UserService { /* user operations */ }\nclass ProductService { /* product operations */ }\nclass OrderService { /* order operations */ }',
+          description:
+            'Split class into smaller, focused classes following Single Responsibility Principle',
+          example:
+            '// Instead of one UserManager:\nclass UserService { /* user operations */ }\nclass ProductService { /* product operations */ }\nclass OrderService { /* order operations */ }',
           impact: 'Improves maintainability, testability, and reduces coupling',
         };
 
@@ -135,8 +134,10 @@ export class CodeSmellDetector {
         return {
           type: 'USE_PARAMETER_OBJECT',
           priority: 'medium',
-          description: 'Replace long parameter list with a parameter object or configuration object',
-          example: '// Before:\nfunction create(a, b, c, d, e, f) {}\n\n// After:\nfunction create(options) {\n  const { a, b, c, d, e, f } = options;\n}',
+          description:
+            'Replace long parameter list with a parameter object or configuration object',
+          example:
+            '// Before:\nfunction create(a, b, c, d, e, f) {}\n\n// After:\nfunction create(options) {\n  const { a, b, c, d, e, f } = options;\n}',
           impact: 'Easier to call, extend, and maintain',
         };
 
@@ -145,7 +146,8 @@ export class CodeSmellDetector {
           type: 'EXTRACT_METHOD',
           priority: 'medium',
           description: 'Break down long method into smaller, focused functions',
-          example: '// Extract logical blocks:\nfunction process() {\n  validate();\n  transform();\n  save();\n}\n\nfunction validate() { /* ... */ }\nfunction transform() { /* ... */ }',
+          example:
+            '// Extract logical blocks:\nfunction process() {\n  validate();\n  transform();\n  save();\n}\n\nfunction validate() { /* ... */ }\nfunction transform() { /* ... */ }',
           impact: 'Improves readability and reusability',
         };
 
@@ -154,7 +156,8 @@ export class CodeSmellDetector {
           type: 'USE_NAMED_CONSTANT',
           priority: 'low',
           description: 'Replace magic numbers with named constants',
-          example: '// Before:\nif (age > 18) {}\n\n// After:\nconst ADULT_AGE = 18;\nif (age > ADULT_AGE) {}',
+          example:
+            '// Before:\nif (age > 18) {}\n\n// After:\nconst ADULT_AGE = 18;\nif (age > ADULT_AGE) {}',
           impact: 'Makes code self-documenting and easier to maintain',
         };
 
@@ -163,7 +166,8 @@ export class CodeSmellDetector {
           type: 'HANDLE_ERRORS_PROPERLY',
           priority: 'high',
           description: 'Handle errors explicitly or at minimum log them',
-          example: 'try {\n  risky();\n} catch (error) {\n  console.error("Operation failed:", error);\n  // or re-throw: throw error;\n}',
+          example:
+            'try {\n  risky();\n} catch (error) {\n  console.error("Operation failed:", error);\n  // or re-throw: throw error;\n}',
           impact: 'Prevents silent failures and aids debugging',
         };
 
@@ -174,7 +178,7 @@ export class CodeSmellDetector {
 
   private deduplicateSuggestions(suggestions: Suggestion[]): Suggestion[] {
     const seen = new Set<string>();
-    return suggestions.filter(s => {
+    return suggestions.filter((s) => {
       if (seen.has(s.type)) return false;
       seen.add(s.type);
       return true;
@@ -186,10 +190,10 @@ export class CodeSmellDetector {
       return 'No code smells detected. Code quality looks good!';
     }
 
-    const critical = findings.filter(f => f.severity === 'critical').length;
-    const high = findings.filter(f => f.severity === 'high').length;
-    const medium = findings.filter(f => f.severity === 'medium').length;
-    const low = findings.filter(f => f.severity === 'low').length;
+    const critical = findings.filter((f) => f.severity === 'critical').length;
+    const high = findings.filter((f) => f.severity === 'high').length;
+    const medium = findings.filter((f) => f.severity === 'medium').length;
+    const low = findings.filter((f) => f.severity === 'low').length;
 
     let summary = `Found ${findings.length} code smell(s): `;
     const parts = [];
@@ -202,9 +206,10 @@ export class CodeSmellDetector {
     // Add specific metrics
     const details = [];
     if (metrics.godObjects > 0) details.push(`${metrics.godObjects} god object(s)`);
-    if (metrics.longParameterLists > 0) details.push(`${metrics.longParameterLists} long parameter list(s)`);
+    if (metrics.longParameterLists > 0)
+      details.push(`${metrics.longParameterLists} long parameter list(s)`);
     if (metrics.emptyCatches > 0) details.push(`${metrics.emptyCatches} empty catch block(s)`);
-    
+
     if (details.length > 0) {
       summary += '. Includes: ' + details.join(', ');
     }

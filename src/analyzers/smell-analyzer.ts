@@ -23,7 +23,7 @@ export class SmellAnalyzer {
    */
   analyzeSmells(filePath: string) {
     const { ast } = this.parser.parseFile(filePath);
-    
+
     return {
       godObjects: this.findGodObjects(ast),
       longParameterLists: this.findLongParameterLists(ast),
@@ -45,10 +45,8 @@ export class SmellAnalyzer {
     traverse(ast, {
       ClassDeclaration(path) {
         const className = path.node.id?.name || 'anonymous';
-        const methods = path.node.body.body.filter(
-          (node: any) => node.type === 'ClassMethod'
-        );
-        
+        const methods = path.node.body.body.filter((node: any) => node.type === 'ClassMethod');
+
         classes.push({
           name: className,
           methods: methods.length,
@@ -78,7 +76,7 @@ export class SmellAnalyzer {
 
     const checkParams = (node: any, name: string) => {
       const paramCount = node.params.length;
-      
+
       if (paramCount > 5) {
         smells.push({
           type: 'LONG_PARAMETER_LIST',
@@ -113,11 +111,11 @@ export class SmellAnalyzer {
 
     const checkLength = (path: any, name: string) => {
       if (!path.node.body || !path.node.loc) return;
-      
+
       const start = path.node.loc.start.line;
       const end = path.node.loc.end.line;
       const lines = end - start;
-      
+
       if (lines > 50) {
         smells.push({
           type: 'LONG_METHOD',
@@ -155,14 +153,14 @@ export class SmellAnalyzer {
     traverse(ast, {
       NumericLiteral(path) {
         const value = path.node.value;
-        
+
         // Skip allowed numbers and array indices
         if (allowedNumbers.has(value)) return;
         if (path.parent.type === 'ArrayExpression') return;
-        
+
         // Count occurrences
         foundNumbers.set(value, (foundNumbers.get(value) || 0) + 1);
-        
+
         // Flag if used multiple times or looks suspicious
         if (value > 10 && value !== Math.floor(value / 100) * 100) {
           smells.push({
@@ -187,7 +185,7 @@ export class SmellAnalyzer {
     traverse(ast, {
       CatchClause(path) {
         const body = path.node.body;
-        
+
         // Check if catch block is empty or only has comments
         if (body.body.length === 0) {
           smells.push({
@@ -213,9 +211,7 @@ export class SmellAnalyzer {
     traverse(ast, {
       ClassDeclaration(path) {
         classCount++;
-        const methods = path.node.body.body.filter(
-          (node: any) => node.type === 'ClassMethod'
-        );
+        const methods = path.node.body.body.filter((node: any) => node.type === 'ClassMethod');
         if (methods.length > 10) {
           largeClasses++;
         }

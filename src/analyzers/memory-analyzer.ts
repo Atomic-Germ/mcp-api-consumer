@@ -29,7 +29,7 @@ export class MemoryAnalyzer {
    */
   analyzeMemory(filePath: string) {
     const { ast } = this.parser.parseFile(filePath);
-    
+
     return {
       allocations: this.findAllocations(ast),
       leaks: this.findPotentialLeaks(ast),
@@ -58,12 +58,12 @@ export class MemoryAnalyzer {
           }
         },
       },
-      
+
       // Detect new Array()
       NewExpression(path) {
         if (path.node.callee.type === 'Identifier') {
           const name = path.node.callee.name;
-          
+
           if (name === 'Array' || name === 'Buffer' || name === 'Date') {
             allocations.push({
               type: name.toLowerCase() as any,
@@ -73,7 +73,7 @@ export class MemoryAnalyzer {
           }
         }
       },
-      
+
       // Detect array literals
       ArrayExpression(path) {
         if (inLoop && path.node.elements.length > 100) {
@@ -85,7 +85,7 @@ export class MemoryAnalyzer {
           });
         }
       },
-      
+
       // Detect object literals in loops
       ObjectExpression(path) {
         if (inLoop && path.node.properties.length > 3) {
@@ -96,7 +96,7 @@ export class MemoryAnalyzer {
           });
         }
       },
-      
+
       // Detect regex in loops
       RegExpLiteral(path) {
         if (inLoop) {
@@ -126,7 +126,7 @@ export class MemoryAnalyzer {
           path.node.callee.property.type === 'Identifier'
         ) {
           const methodName = path.node.callee.property.name;
-          
+
           // Event listeners
           if (methodName === 'addEventListener') {
             leaks.push({
@@ -135,7 +135,7 @@ export class MemoryAnalyzer {
               description: 'addEventListener called without corresponding removeEventListener',
             });
           }
-          
+
           // Timers
           if (methodName === 'setInterval' || methodName === 'setTimeout') {
             leaks.push({
@@ -145,11 +145,11 @@ export class MemoryAnalyzer {
             });
           }
         }
-        
+
         // Detect unbounded cache growth (obj[key] = value pattern)
         if (path.node.callee.type === 'Identifier') {
           const funcName = path.node.callee.name;
-          
+
           if (funcName.toLowerCase().includes('cache')) {
             leaks.push({
               type: 'cache',
@@ -159,7 +159,7 @@ export class MemoryAnalyzer {
           }
         }
       },
-      
+
       // Detect closures capturing large data
       FunctionExpression: (path) => {
         // Check if parent has large array/object declarations
@@ -175,7 +175,7 @@ export class MemoryAnalyzer {
           }
         }
       },
-      
+
       ArrowFunctionExpression: (path) => {
         const parent = path.getFunctionParent();
         if (parent) {
@@ -199,13 +199,13 @@ export class MemoryAnalyzer {
    */
   private findClosureIssues(ast: any) {
     const issues: Array<{ line?: number; type: string }> = [];
-    
+
     traverse(ast, {
       ReturnStatement(path) {
         if (
           path.node.argument &&
           (path.node.argument.type === 'FunctionExpression' ||
-           path.node.argument.type === 'ArrowFunctionExpression')
+            path.node.argument.type === 'ArrowFunctionExpression')
         ) {
           issues.push({
             line: path.node.loc?.start.line,
@@ -223,7 +223,7 @@ export class MemoryAnalyzer {
    */
   findUnnecessaryCopies(ast: any) {
     const copies: Array<{ line?: number; pattern: string }> = [];
-    
+
     traverse(ast, {
       SpreadElement(path) {
         if (path.parent.type === 'ArrayExpression') {
@@ -233,7 +233,7 @@ export class MemoryAnalyzer {
           });
         }
       },
-      
+
       CallExpression(path) {
         if (
           path.node.callee.type === 'MemberExpression' &&
@@ -259,7 +259,7 @@ export class MemoryAnalyzer {
 function checkForLargeDataInScope(node: any): boolean {
   // Simple heuristic: look for new Array with large size
   if (!node.body || !node.body.body) return false;
-  
+
   for (const statement of node.body.body) {
     if (statement.type === 'VariableDeclaration') {
       for (const decl of statement.declarations) {
@@ -279,6 +279,6 @@ function checkForLargeDataInScope(node: any): boolean {
       }
     }
   }
-  
+
   return false;
 }

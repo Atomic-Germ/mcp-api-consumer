@@ -2,10 +2,7 @@
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { OptimistServer } from './server.js';
 import { PerformanceAnalyzer } from './tools/performance.js';
 import { MemoryOptimizer } from './tools/memory.js';
@@ -21,7 +18,7 @@ async function main() {
   const memoryOptimizer = new MemoryOptimizer();
   const complexityAnalyzer = new ComplexityAnalyzer();
   const codeSmellDetector = new CodeSmellDetector();
-  
+
   const server = new Server(
     {
       name: optimist.name,
@@ -149,7 +146,7 @@ async function main() {
   // Start server with stdio transport
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  
+
   console.error('Optimist MCP server running on stdio');
 }
 

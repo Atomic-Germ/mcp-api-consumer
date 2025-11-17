@@ -14,7 +14,10 @@ export class MemoryOptimizer {
   /**
    * Analyze a file for memory issues
    */
-  async analyze(filePath: string, options: { detectLeaks?: boolean; suggestFixes?: boolean } = {}): Promise<AnalysisResult> {
+  async analyze(
+    filePath: string,
+    options: { detectLeaks?: boolean; suggestFixes?: boolean } = {}
+  ): Promise<AnalysisResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
@@ -29,12 +32,12 @@ export class MemoryOptimizer {
 
     try {
       const analysis = this.analyzer.analyzeMemory(filePath);
-      
+
       // Process allocations
-      analysis.allocations.forEach(alloc => {
+      analysis.allocations.forEach((alloc) => {
         if (alloc.inLoop) {
           metrics.allocationsInLoops++;
-          
+
           const severity = this.getAllocationSeverity(alloc);
           findings.push({
             type: 'LARGE_ALLOCATION_IN_LOOP',
@@ -60,12 +63,13 @@ export class MemoryOptimizer {
       });
 
       // Process potential leaks
-      analysis.leaks.forEach(leak => {
+      analysis.leaks.forEach((leak) => {
         metrics.potentialLeaks++;
-        
+
         const findingType = this.getLeakFindingType(leak.type);
-        const severity = leak.type === 'event_listener' || leak.type === 'timer' ? 'high' : 'medium';
-        
+        const severity =
+          leak.type === 'event_listener' || leak.type === 'timer' ? 'high' : 'medium';
+
         findings.push({
           type: findingType,
           severity,
@@ -89,9 +93,9 @@ export class MemoryOptimizer {
       });
 
       // Process closure issues
-      analysis.closures.forEach(closure => {
+      analysis.closures.forEach((closure) => {
         metrics.closureIssues++;
-        
+
         if (closure.type === 'RETURNS_CLOSURE') {
           findings.push({
             type: 'CLOSURE_LEAK',
@@ -119,8 +123,8 @@ export class MemoryOptimizer {
       const copies = this.analyzer.findUnnecessaryCopies(
         this.analyzer['parser'].parseFile(filePath).ast
       );
-      
-      copies.forEach(copy => {
+
+      copies.forEach((copy) => {
         findings.push({
           type: 'UNNECESSARY_COPY',
           severity: 'low',
@@ -306,10 +310,10 @@ export class MemoryOptimizer {
       return 'Memory analysis complete. No significant issues detected.';
     }
 
-    const critical = findings.filter(f => f.severity === 'critical').length;
-    const high = findings.filter(f => f.severity === 'high').length;
-    const medium = findings.filter(f => f.severity === 'medium').length;
-    const low = findings.filter(f => f.severity === 'low').length;
+    const critical = findings.filter((f) => f.severity === 'critical').length;
+    const high = findings.filter((f) => f.severity === 'high').length;
+    const medium = findings.filter((f) => f.severity === 'medium').length;
+    const low = findings.filter((f) => f.severity === 'low').length;
 
     let summary = `Found ${findings.length} memory issue(s): `;
     const parts = [];

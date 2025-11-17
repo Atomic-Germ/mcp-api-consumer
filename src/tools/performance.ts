@@ -32,11 +32,11 @@ export class PerformanceAnalyzer {
       // Analyze loops
       const loops = this.parser.findLoops(ast);
       metrics.totalLoops = loops.length;
-      metrics.maxLoopDepth = Math.max(...loops.map(l => l.depth), 0);
-      metrics.nestedLoops = loops.filter(l => l.depth > 1).length;
+      metrics.maxLoopDepth = Math.max(...loops.map((l) => l.depth), 0);
+      metrics.nestedLoops = loops.filter((l) => l.depth > 1).length;
 
       // Detect nested loops
-      loops.forEach(loop => {
+      loops.forEach((loop) => {
         if (loop.depth >= 3) {
           findings.push({
             type: 'NESTED_LOOPS',
@@ -54,7 +54,8 @@ export class PerformanceAnalyzer {
             type: 'OPTIMIZE_ALGORITHM',
             priority: 'high',
             description: `Reduce loop nesting from depth ${loop.depth}. Consider using more efficient algorithms or data structures.`,
-            example: 'Use hash maps for lookups instead of nested loops, or consider streaming/chunking for large datasets.',
+            example:
+              'Use hash maps for lookups instead of nested loops, or consider streaming/chunking for large datasets.',
             impact: `Potential performance improvement: O(n^${loop.depth}) → O(n) or O(n log n)`,
           });
         } else if (loop.depth === 2) {
@@ -86,7 +87,7 @@ export class PerformanceAnalyzer {
 
       // Detect string concatenation in loops
       const stringConcatIssues = this.parser.findStringConcatenationInLoops(ast);
-      stringConcatIssues.forEach(issue => {
+      stringConcatIssues.forEach((issue) => {
         findings.push({
           type: 'INEFFICIENT_STRING_CONCAT',
           severity: 'medium',
@@ -103,7 +104,8 @@ export class PerformanceAnalyzer {
           priority: 'medium',
           description: 'Use array join instead of string concatenation in loops',
           example: 'Instead of: str += item\nUse: items.push(item); str = items.join("")',
-          impact: 'Reduces memory allocations and improves performance significantly for large strings',
+          impact:
+            'Reduces memory allocations and improves performance significantly for large strings',
         });
       });
 
@@ -161,9 +163,9 @@ export class PerformanceAnalyzer {
       return `Performance analysis complete. Analyzed ${metrics.totalFunctions} functions and ${metrics.totalLoops} loops. No critical issues found.`;
     }
 
-    const critical = findings.filter(f => f.severity === 'critical').length;
-    const high = findings.filter(f => f.severity === 'high').length;
-    const medium = findings.filter(f => f.severity === 'medium').length;
+    const critical = findings.filter((f) => f.severity === 'critical').length;
+    const high = findings.filter((f) => f.severity === 'high').length;
+    const medium = findings.filter((f) => f.severity === 'medium').length;
 
     let summary = `Found ${findings.length} performance issue(s): `;
     const parts = [];

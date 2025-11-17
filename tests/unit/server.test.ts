@@ -35,7 +35,7 @@ describe('OptimistServer', () => {
     it('should include analyze_performance tool', () => {
       const server = new OptimistServer();
       const tools = server.listTools();
-      const perfTool = tools.find(t => t.name === 'analyze_performance');
+      const perfTool = tools.find((t) => t.name === 'analyze_performance');
       expect(perfTool).toBeDefined();
       expect(perfTool?.description).toContain('performance');
     });

@@ -26,13 +26,13 @@ export class ComplexityAnalyzer {
   analyzeComplexity(filePath: string) {
     const { ast } = this.parser.parseFile(filePath);
     const functions = this.analyzeFunctions(ast);
-    
+
     return {
       functions,
       totalFunctions: functions.length,
-      averageComplexity: this.calculateAverage(functions.map(f => f.cyclomatic)),
-      maxComplexity: Math.max(...functions.map(f => f.cyclomatic), 0),
-      averageCognitive: this.calculateAverage(functions.map(f => f.cognitive)),
+      averageComplexity: this.calculateAverage(functions.map((f) => f.cyclomatic)),
+      maxComplexity: Math.max(...functions.map((f) => f.cyclomatic), 0),
+      averageCognitive: this.calculateAverage(functions.map((f) => f.cognitive)),
       totalDecisionPoints: functions.reduce((sum, f) => sum + f.decisionPoints, 0),
       mostComplexFunction: this.findMostComplex(functions),
     };
@@ -90,7 +90,7 @@ export class ComplexityAnalyzer {
         cyclomatic++;
         decisionPoints++;
         const currentNesting = this.getNestingLevel(subPath);
-        cognitive += (currentNesting + 1);
+        cognitive += currentNesting + 1;
         if (currentNesting > maxNesting) {
           maxNesting = currentNesting;
         }
@@ -105,7 +105,7 @@ export class ComplexityAnalyzer {
         cyclomatic++;
         decisionPoints++;
         const currentNesting = this.getNestingLevel(subPath);
-        cognitive += (currentNesting + 1);
+        cognitive += currentNesting + 1;
         if (currentNesting > maxNesting) {
           maxNesting = currentNesting;
         }
@@ -115,7 +115,7 @@ export class ComplexityAnalyzer {
         cyclomatic++;
         decisionPoints++;
         const currentNesting = this.getNestingLevel(subPath);
-        cognitive += (currentNesting + 1);
+        cognitive += currentNesting + 1;
         if (currentNesting > maxNesting) {
           maxNesting = currentNesting;
         }
@@ -125,7 +125,7 @@ export class ComplexityAnalyzer {
         cyclomatic++;
         decisionPoints++;
         const currentNesting = this.getNestingLevel(subPath);
-        cognitive += (currentNesting + 1);
+        cognitive += currentNesting + 1;
         if (currentNesting > maxNesting) {
           maxNesting = currentNesting;
         }
@@ -135,7 +135,7 @@ export class ComplexityAnalyzer {
         cyclomatic++;
         decisionPoints++;
         const currentNesting = this.getNestingLevel(subPath);
-        cognitive += (currentNesting + 1);
+        cognitive += currentNesting + 1;
         if (currentNesting > maxNesting) {
           maxNesting = currentNesting;
         }
@@ -145,7 +145,7 @@ export class ComplexityAnalyzer {
         cyclomatic++;
         decisionPoints++;
         const currentNesting = this.getNestingLevel(subPath);
-        cognitive += (currentNesting + 1);
+        cognitive += currentNesting + 1;
         if (currentNesting > maxNesting) {
           maxNesting = currentNesting;
         }
@@ -187,7 +187,7 @@ export class ComplexityAnalyzer {
   private getNestingLevel(path: any): number {
     let level = 0;
     let current = path.parentPath;
-    
+
     while (current) {
       if (
         current.isIfStatement() ||
@@ -202,7 +202,7 @@ export class ComplexityAnalyzer {
       }
       current = current.parentPath;
     }
-    
+
     return level;
   }
 
@@ -220,11 +220,9 @@ export class ComplexityAnalyzer {
    */
   private findMostComplex(functions: FunctionComplexity[]): string | undefined {
     if (functions.length === 0) return undefined;
-    
-    const most = functions.reduce((max, f) => 
-      f.cyclomatic > max.cyclomatic ? f : max
-    );
-    
+
+    const most = functions.reduce((max, f) => (f.cyclomatic > max.cyclomatic ? f : max));
+
     return `${most.name} (complexity: ${most.cyclomatic})`;
   }
 }

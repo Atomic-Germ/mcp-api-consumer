@@ -26,7 +26,7 @@ export class ComplexityAnalyzer {
 
     try {
       const analysis = this.analyzer.analyzeComplexity(filePath);
-      
+
       const metrics: Record<string, any> = {
         totalFunctions: analysis.totalFunctions,
         averageComplexity: analysis.averageComplexity,
@@ -37,7 +37,7 @@ export class ComplexityAnalyzer {
       };
 
       // Analyze each function
-      analysis.functions.forEach(func => {
+      analysis.functions.forEach((func) => {
         // Check cyclomatic complexity
         if (func.cyclomatic > maxComplexity * 2) {
           findings.push({
@@ -55,7 +55,8 @@ export class ComplexityAnalyzer {
             type: 'BREAK_DOWN_FUNCTION',
             priority: 'high',
             description: `Break down '${func.name}' into smaller, focused functions`,
-            example: '// Extract complex logic into separate functions:\nfunction validate() {\n  if (!checkA()) return false;\n  if (!checkB()) return false;\n  return true;\n}\n\nfunction checkA() { /* ... */ }\nfunction checkB() { /* ... */ }',
+            example:
+              '// Extract complex logic into separate functions:\nfunction validate() {\n  if (!checkA()) return false;\n  if (!checkB()) return false;\n  return true;\n}\n\nfunction checkA() { /* ... */ }\nfunction checkB() { /* ... */ }',
             impact: `Reducing complexity from ${func.cyclomatic} to ~${Math.ceil(func.cyclomatic / 3)} per function improves testability and maintainability`,
           });
         } else if (func.cyclomatic > maxComplexity) {
@@ -74,7 +75,8 @@ export class ComplexityAnalyzer {
             type: 'REFACTOR_FUNCTION',
             priority: 'medium',
             description: `Refactor '${func.name}' to reduce complexity`,
-            example: 'Consider using early returns, extracting methods, or simplifying conditional logic',
+            example:
+              'Consider using early returns, extracting methods, or simplifying conditional logic',
             impact: 'Makes code easier to test, understand, and maintain',
           });
         }
@@ -96,7 +98,8 @@ export class ComplexityAnalyzer {
             type: 'REDUCE_COGNITIVE_LOAD',
             priority: 'high',
             description: 'Reduce cognitive complexity by simplifying control flow',
-            example: '// Use early returns:\nif (!valid) return error;\nif (!ready) return pending;\nreturn success;\n\n// Instead of nested ifs',
+            example:
+              '// Use early returns:\nif (!valid) return error;\nif (!ready) return pending;\nreturn success;\n\n// Instead of nested ifs',
             impact: 'Significantly improves code readability and comprehension',
           });
         }
@@ -118,7 +121,8 @@ export class ComplexityAnalyzer {
             type: 'REDUCE_NESTING',
             priority: 'medium',
             description: 'Flatten nested conditions using guard clauses',
-            example: '// BAD:\nif (a) {\n  if (b) {\n    if (c) {\n      doWork();\n    }\n  }\n}\n\n// GOOD:\nif (!a) return;\nif (!b) return;\nif (!c) return;\ndoWork();',
+            example:
+              '// BAD:\nif (a) {\n  if (b) {\n    if (c) {\n      doWork();\n    }\n  }\n}\n\n// GOOD:\nif (!a) return;\nif (!b) return;\nif (!c) return;\ndoWork();',
             impact: 'Improves readability and reduces cognitive load',
           });
         }
@@ -129,7 +133,8 @@ export class ComplexityAnalyzer {
         suggestions.push({
           type: 'GENERAL',
           priority: 'low',
-          description: 'Code complexity is well-managed. All functions are within acceptable limits.',
+          description:
+            'Code complexity is well-managed. All functions are within acceptable limits.',
           impact: 'Maintain current practices for readable, maintainable code',
         });
       }
@@ -178,9 +183,9 @@ export class ComplexityAnalyzer {
       return `Complexity analysis complete. Analyzed ${metrics.totalFunctions} function(s). Average complexity: ${metrics.averageComplexity}. No issues found.`;
     }
 
-    const critical = findings.filter(f => f.severity === 'critical').length;
-    const high = findings.filter(f => f.severity === 'high').length;
-    const medium = findings.filter(f => f.severity === 'medium').length;
+    const critical = findings.filter((f) => f.severity === 'critical').length;
+    const high = findings.filter((f) => f.severity === 'high').length;
+    const medium = findings.filter((f) => f.severity === 'medium').length;
 
     let summary = `Found ${findings.length} complexity issue(s): `;
     const parts = [];

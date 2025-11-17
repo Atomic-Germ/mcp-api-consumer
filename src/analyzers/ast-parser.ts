@@ -84,9 +84,7 @@ export class ASTParser {
     loops.forEach((loop, index) => {
       if (loop.depth > 1) {
         // Count deeper nested loops
-        const nestedCount = loops.filter(
-          (l, i) => i > index && l.depth > loop.depth
-        ).length;
+        const nestedCount = loops.filter((l, i) => i > index && l.depth > loop.depth).length;
         loop.nestedLoops = nestedCount;
       }
     });
@@ -155,7 +153,7 @@ export class ASTParser {
         if (!inLoop) return;
 
         const { operator, left, right } = path.node;
-        
+
         if (operator === '+=' && right.type === 'BinaryExpression' && right.operator === '+') {
           const varName = left.type === 'Identifier' ? left.name : 'unknown';
           issues.push({
@@ -173,7 +171,6 @@ export class ASTParser {
 
     return issues;
   }
-
 }
 
 function getLoopType(node: Node): LoopInfo['type'] {
