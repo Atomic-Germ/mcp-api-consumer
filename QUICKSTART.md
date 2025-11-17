@@ -1,103 +1,197 @@
-# Quick Start Guide - Optimist MCP Server
+# Optimist MCP Server - Quick Start Guide
 
-## What You Have
+Get your code optimization MCP server running in under 5 minutes!
 
-A fully functional MCP server foundation for code optimization with:
-- ✅ 8 analysis tools defined
-- ✅ TypeScript configuration
-- ✅ Test infrastructure (Jest)
-- ✅ 5 passing unit tests
-- ✅ MCP protocol integration
-- ✅ Build system ready
+## Prerequisites
 
-## Try It Now
+- Node.js 18+
+- npm or pnpm
+- An MCP-compatible client (e.g., Claude Desktop)
+- A codebase to analyze
 
-### 1. Test the Server
+## 1. Installation
 
 ```bash
-# Run tests
+# Clone and setup
+git clone https://github.com/Atomic-Germ/mcp-optimist.git
+cd mcp-optimist
+npm install
+npm run build
+```
+
+## 2. Test the Server
+
+```bash
+# Run tests to verify everything works
 npm test
 
 # Run with coverage
 npm run test:coverage
 
-# Watch mode
-npm run test:watch
+# Verify build output
+ls -la dist/
 ```
 
-### 2. Build the Server
+## 3. Configure MCP Client
 
-```bash
-# Compile TypeScript
-npm run build
+### Claude Desktop
 
-# The compiled server will be in dist/
-ls -l dist/
-```
+Edit your configuration file:
 
-### 3. Run the MCP Server
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/claude/claude_desktop_config.json`
 
-```bash
-# Run directly (requires MCP client to connect via stdio)
-npm start
+Add the server:
 
-# Or use the built version
-node dist/index.js
-```
-
-### 4. Integrate with Claude Desktop
-
-Edit your Claude Desktop config:
-
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
-**Linux**: `~/.config/Claude/claude_desktop_config.json`
-
-Add:
 ```json
 {
   "mcpServers": {
     "optimist": {
       "command": "node",
-      "args": ["/absolute/path/to/mcp-optimist/dist/index.js"]
+      "args": ["/absolute/path/to/mcp-optimist/dist/index.js"],
+      "env": {}
     }
   }
 }
 ```
 
-Restart Claude Desktop and you'll see "optimist" in the MCP tools list!
+### Other MCP Clients
 
-## What Works Now
+Use these connection details:
+- **Command**: `node`
+- **Args**: `["/path/to/mcp-optimist/dist/index.js"]`
+- **Protocol**: stdio
 
-### List Tools
-The server can list all 8 optimization tools:
-- analyze_performance
-- optimize_memory
-- analyze_complexity
-- detect_code_smells
-- analyze_dependencies
-- find_dead_code
-- optimize_hot_paths
-- suggest_refactoring
+## 4. Verify Setup
 
-### Tool Invocation
-Tools can be called via MCP, though implementations are pending (will return placeholder messages).
+1. Restart your MCP client
+2. Look for "optimist" in the available tools
+3. You should see 8 optimization tools available
 
-## Next Development Steps
+## 5. First Code Analysis
 
-### Phase 2: Implement First Tool (Performance Analyzer)
+Try these examples in your MCP client:
 
-```bash
-# Start new TDD cycle
-# (Using mcp-tdd tools if available)
+### Analyze Code Complexity
 
-# 1. Write failing tests for performance analyzer
-# 2. Implement minimal code to pass tests
-# 3. Refactor
-# 4. Move to next tool
+```
+Use analyze_complexity tool on your project:
+Path: "./src"
+Max Complexity: 10
+Report Format: "summary"
 ```
 
-### Add Your Own Tool
+### Detect Performance Issues
+
+```
+Use analyze_performance tool:
+Path: "./src"
+Include Tests: false
+Threshold: "medium"
+```
+
+### Find Code Smells
+
+```
+Use detect_code_smells tool:
+Path: "./src"
+Severity: "medium"
+```
+
+### Memory Analysis
+
+```
+Use optimize_memory tool:
+Path: "./src"
+Detect Leaks: true
+Suggest Fixes: true
+```
+
+## 6. Verify Everything Works
+
+✅ **Tools Listed**: All 8 optimization tools are available  
+✅ **Analysis Runs**: Tools execute without errors  
+✅ **Results Format**: Consistent response structure  
+✅ **File Processing**: Can analyze your codebase  
+
+## Available Tools
+
+| Tool | Purpose |
+|------|---------|
+| `analyze_performance` | Find performance bottlenecks |
+| `optimize_memory` | Detect memory leaks and inefficiencies |
+| `analyze_complexity` | Measure code complexity metrics |
+| `detect_code_smells` | Identify anti-patterns and quality issues |
+| `analyze_dependencies` | Analyze dependency graphs |
+| `find_dead_code` | Locate unused code |
+| `optimize_hot_paths` | Optimize frequently executed code |
+| `suggest_refactoring` | Get AI-powered refactoring suggestions |
+
+## Common Issues
+
+### Build errors
+
+```bash
+# Clean and rebuild
+npm run clean
+npm install
+npm run build
+```
+
+### MCP client can't find tools
+
+- Check the absolute path in configuration
+- Restart your MCP client after config changes
+- Verify build succeeded: `ls -la dist/`
+
+### Analysis errors
+
+- Ensure the target path exists and is readable
+- Check that file extensions are supported (`.js`, `.ts`, `.jsx`, `.tsx`)
+- Review ignore patterns in configuration
+
+## Configuration
+
+Create `optimist.config.json` in your project root:
+
+```json
+{
+  "analysis": {
+    "depth": "deep",
+    "ignorePatterns": ["**/node_modules/**", "**/dist/**"],
+    "fileExtensions": [".js", ".ts", ".jsx", ".tsx"]
+  },
+  "complexity": {
+    "maxCyclomatic": 10,
+    "maxCognitive": 15
+  },
+  "performance": {
+    "threshold": "medium",
+    "profileHotPaths": true
+  }
+}
+```
+
+## Next Steps
+
+- 📖 **Full Documentation**: See [README.md](./README.md)
+- 🏗️ **Architecture**: Read [ARCHITECTURE.md](./ARCHITECTURE.md)
+- 🤝 **Contributing**: See [CONTRIBUTING.md](./CONTRIBUTING.md)
+- 📊 **Project Summary**: Check [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)
+
+## Integration with Other Tools
+
+Optimist works great with:
+- **mcp-consult** - Get AI consultation on optimization strategies
+- **mcp-tdd** - Apply optimizations using test-driven development
+- **Your IDE** - Use analysis results to guide refactoring
+
+---
+
+**🎉 You're ready to optimize your codebase with AI-powered analysis!**
+
+Need help? Check our [documentation](./docs/) or [open an issue](https://github.com/Atomic-Germ/mcp-optimist/issues).
 
 1. **Define in server.ts** - Add to `listTools()` method
 2. **Create analyzer** - Add to `src/analyzers/your-tool.ts`
