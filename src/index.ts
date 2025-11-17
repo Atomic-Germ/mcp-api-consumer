@@ -10,6 +10,7 @@ import { OptimistServer } from './server.js';
 import { PerformanceAnalyzer } from './tools/performance.js';
 import { MemoryOptimizer } from './tools/memory.js';
 import { ComplexityAnalyzer } from './tools/complexity.js';
+import { CodeSmellDetector } from './tools/code-smells.js';
 
 /**
  * Main entry point for the Optimist MCP server
@@ -19,6 +20,7 @@ async function main() {
   const performanceAnalyzer = new PerformanceAnalyzer();
   const memoryOptimizer = new MemoryOptimizer();
   const complexityAnalyzer = new ComplexityAnalyzer();
+  const codeSmellDetector = new CodeSmellDetector();
   
   const server = new Server(
     {
@@ -90,6 +92,25 @@ async function main() {
             reportFormat: (args as any).reportFormat,
           };
           const result = await complexityAnalyzer.analyze(path, options);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'detect_code_smells': {
+          const path = (args as any).path;
+          if (!path) {
+            throw new Error('Missing required argument: path');
+          }
+          const options = {
+            severity: (args as any).severity,
+          };
+          const result = await codeSmellDetector.analyze(path, options);
           return {
             content: [
               {
