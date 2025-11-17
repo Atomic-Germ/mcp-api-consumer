@@ -8,6 +8,7 @@ import { PerformanceAnalyzer } from './tools/performance.js';
 import { MemoryOptimizer } from './tools/memory.js';
 import { ComplexityAnalyzer } from './tools/complexity.js';
 import { CodeSmellDetector } from './tools/code-smells.js';
+import { RefactoringSuggester } from './tools/refactoring.js';
 
 /**
  * Main entry point for the Optimist MCP server
@@ -18,6 +19,7 @@ async function main() {
   const memoryOptimizer = new MemoryOptimizer();
   const complexityAnalyzer = new ComplexityAnalyzer();
   const codeSmellDetector = new CodeSmellDetector();
+  const refactoringSuggester = new RefactoringSuggester();
 
   const server = new Server(
     {
@@ -118,8 +120,28 @@ async function main() {
           };
         }
 
-        default:
-          // Tool implementations will be added in future TDD cycles
+        case 'suggest_refactoring': {
+          const path = (args as any).path;
+          if (!path) {
+            throw new Error('Missing required argument: path');
+          }
+          const options = {
+            focusArea: (args as any).focusArea,
+          };
+          const result = await refactoringSuggester.analyze(path, options);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'analyze_dependencies':
+        case 'find_dead_code':
+        case 'optimize_hot_paths': {
           return {
             content: [
               {
@@ -128,6 +150,18 @@ async function main() {
               },
             ],
           };
+        }
+
+        default: {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Tool '${name}' implementation pending. Arguments received: ${JSON.stringify(args, null, 2)}`,
+              },
+            ],
+          };
+        }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
