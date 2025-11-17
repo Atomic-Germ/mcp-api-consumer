@@ -319,6 +319,17 @@ We welcome contributions! Please follow these guidelines:
 - Follow existing code style
 - Update documentation
 
+## Integration with Other MCP Tools
+
+Optimist works seamlessly alongside other MCP servers:
+
+- **mcp-consult** - AI consultation and reasoning for complex optimization decisions
+- **mcp-tdd** - Test-driven development workflows during refactoring
+- **Code Analysis Tools** - Linters, formatters, type checkers
+- **Testing Frameworks** - Jest, Vitest, Mocha
+- **Build Tools** - Webpack, Vite, Rollup
+- **CI/CD Systems** - GitHub Actions, GitLab CI, Jenkins
+
 ## Roadmap
 
 ### Phase 1 - Foundation (Current)
