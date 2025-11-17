@@ -1,25 +1,61 @@
-name: CI
+name: MCP Optimist CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feat/** ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, feat/** ]
 
 jobs:
-  build:
-    runs-on: macos-latest
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm ci
+      
+      - name: Build TypeScript
+        run: pnpm build
+      
+      - name: Run tests
+        run: |
+          pnpm test
+          pnpm test:coverage
+      
+      - name: Verify Optimist modules
+        run: |
+          echo "Checking compiled Optimist modules..."
+          ls -lh dist/*.js
+          echo "✅ Optimist modules present"
+  
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-      - name: Install
-        run: |
-          brew install patch-package pnpm
-          pnpm i
-      - name: Build
-        run: pnpm build
-      - name: Run tests
-        run: pnpm test
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm ci
+      
+      - name: Check TypeScript
+        run: npx tsc --noEmit
