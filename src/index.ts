@@ -8,6 +8,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { OptimistServer } from './server.js';
 import { PerformanceAnalyzer } from './tools/performance.js';
+import { MemoryOptimizer } from './tools/memory.js';
 
 /**
  * Main entry point for the Optimist MCP server
@@ -15,6 +16,7 @@ import { PerformanceAnalyzer } from './tools/performance.js';
 async function main() {
   const optimist = new OptimistServer();
   const performanceAnalyzer = new PerformanceAnalyzer();
+  const memoryOptimizer = new MemoryOptimizer();
   
   const server = new Server(
     {
@@ -46,6 +48,26 @@ async function main() {
             throw new Error('Missing required argument: path');
           }
           const result = await performanceAnalyzer.analyze(path);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'optimize_memory': {
+          const path = (args as any).path;
+          if (!path) {
+            throw new Error('Missing required argument: path');
+          }
+          const options = {
+            detectLeaks: (args as any).detectLeaks,
+            suggestFixes: (args as any).suggestFixes,
+          };
+          const result = await memoryOptimizer.analyze(path, options);
           return {
             content: [
               {
