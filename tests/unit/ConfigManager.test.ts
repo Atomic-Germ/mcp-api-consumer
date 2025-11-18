@@ -32,33 +32,29 @@ describe('ConfigManager', () => {
     });
 
     it('should throw ValidationError for invalid URL', () => {
-      expect(() => new ConfigManager({ ollamaBaseUrl: 'not-a-url' }))
-        .toThrow(ValidationError);
+      expect(() => new ConfigManager({ ollamaBaseUrl: 'not-a-url' })).toThrow(ValidationError);
     });
 
     it('should throw ValidationError for non-HTTP protocol', () => {
-      expect(() => new ConfigManager({ ollamaBaseUrl: 'ftp://localhost:11434' }))
-        .toThrow(ValidationError);
+      expect(() => new ConfigManager({ ollamaBaseUrl: 'ftp://localhost:11434' })).toThrow(
+        ValidationError
+      );
     });
 
     it('should throw ValidationError for timeout too small', () => {
-      expect(() => new ConfigManager({ timeout: 500 }))
-        .toThrow(ValidationError);
+      expect(() => new ConfigManager({ timeout: 500 })).toThrow(ValidationError);
     });
 
     it('should throw ValidationError for timeout too large', () => {
-      expect(() => new ConfigManager({ timeout: 400000 }))
-        .toThrow(ValidationError);
+      expect(() => new ConfigManager({ timeout: 400000 })).toThrow(ValidationError);
     });
 
     it('should throw ValidationError for negative retries', () => {
-      expect(() => new ConfigManager({ maxRetries: -1 }))
-        .toThrow(ValidationError);
+      expect(() => new ConfigManager({ maxRetries: -1 })).toThrow(ValidationError);
     });
 
     it('should throw ValidationError for retries too large', () => {
-      expect(() => new ConfigManager({ maxRetries: 11 }))
-        .toThrow(ValidationError);
+      expect(() => new ConfigManager({ maxRetries: 11 })).toThrow(ValidationError);
     });
   });
 

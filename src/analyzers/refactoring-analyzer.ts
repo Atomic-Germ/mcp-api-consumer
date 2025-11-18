@@ -32,21 +32,27 @@ export class RefactoringAnalyzer {
     focusArea: string;
   } {
     const opportunities: RefactoringOpportunity[] = [];
+    // Default to 'all' for invalid focus areas
+    const validFocusArea = ['performance', 'maintainability', 'readability', 'all'].includes(
+      focusArea
+    )
+      ? focusArea
+      : 'all';
 
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
       const lines = content.split('\n');
 
       // Analyze for different refactoring opportunities based on focus area
-      if (focusArea === 'all' || focusArea === 'performance') {
+      if (validFocusArea === 'all' || validFocusArea === 'performance') {
         this.findPerformanceOpportunities(lines, filePath, opportunities);
       }
 
-      if (focusArea === 'all' || focusArea === 'maintainability') {
+      if (validFocusArea === 'all' || validFocusArea === 'maintainability') {
         this.findMaintainabilityOpportunities(lines, filePath, opportunities);
       }
 
-      if (focusArea === 'all' || focusArea === 'readability') {
+      if (validFocusArea === 'all' || validFocusArea === 'readability') {
         this.findReadabilityOpportunities(lines, filePath, opportunities);
       }
     } catch (error) {
@@ -57,7 +63,7 @@ export class RefactoringAnalyzer {
       opportunities,
       totalOpportunities: opportunities.length,
       priorityBreakdown: this.countByPriority(opportunities),
-      focusArea,
+      focusArea: validFocusArea,
     };
   }
 
@@ -229,9 +235,7 @@ export class RefactoringAnalyzer {
     });
   }
 
-  private countByPriority(
-    opportunities: RefactoringOpportunity[]
-  ): Record<string, number> {
+  private countByPriority(opportunities: RefactoringOpportunity[]): Record<string, number> {
     return {
       high: opportunities.filter((o) => o.priority === 'high').length,
       medium: opportunities.filter((o) => o.priority === 'medium').length,

@@ -6,7 +6,7 @@ function complexValidation(data) {
   if (!data) {
     return { valid: false, error: 'No data' };
   }
-  
+
   if (data.type === 'user') {
     if (data.age) {
       if (data.age < 18) {
@@ -52,14 +52,14 @@ function matrixOperation(matrix) {
   if (!matrix || !Array.isArray(matrix)) {
     return null;
   }
-  
+
   const result = [];
-  
+
   for (let i = 0; i < matrix.length; i++) {
     if (!Array.isArray(matrix[i])) {
       continue;
     }
-    
+
     const row = [];
     for (let j = 0; j < matrix[i].length; j++) {
       if (typeof matrix[i][j] === 'number') {
@@ -76,12 +76,12 @@ function matrixOperation(matrix) {
         }
       }
     }
-    
+
     if (row.length > 0) {
       result.push(row);
     }
   }
-  
+
   return result;
 }
 
@@ -91,7 +91,7 @@ function processTransaction(transaction) {
   if (!transaction) {
     throw new Error('No transaction');
   }
-  
+
   if (transaction.type === 'payment') {
     if (transaction.amount > 0) {
       if (transaction.currency === 'USD') {
@@ -144,10 +144,20 @@ function processTransaction(transaction) {
 }
 
 // Helper functions (not analyzed)
-function processPayment(t) { return { success: true }; }
-function processBankTransfer(t) { return { success: true }; }
-function processSmallPayment(t) { return { success: true }; }
-function processEuroPayment(t) { return { success: true }; }
-function processRefund(t) { return { success: true }; }
+function processPayment(_t) {
+  return { success: true };
+}
+function processBankTransfer(_t) {
+  return { success: true };
+}
+function processSmallPayment(_t) {
+  return { success: true };
+}
+function processEuroPayment(_t) {
+  return { success: true };
+}
+function processRefund(_t) {
+  return { success: true };
+}
 
 module.exports = { complexValidation, matrixOperation, processTransaction };

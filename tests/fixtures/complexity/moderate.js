@@ -6,15 +6,15 @@ function validateUser(user) {
   if (!user) {
     return false;
   }
-  
+
   if (!user.name || user.name.length < 3) {
     return false;
   }
-  
+
   if (!user.email || !user.email.includes('@')) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -54,14 +54,14 @@ function findMax(numbers) {
   if (!numbers || numbers.length === 0) {
     return null;
   }
-  
+
   let max = numbers[0];
   for (let i = 1; i < numbers.length; i++) {
     if (numbers[i] > max) {
       max = numbers[i];
     }
   }
-  
+
   return max;
 }
 

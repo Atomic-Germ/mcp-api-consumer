@@ -22,7 +22,7 @@ class UserManager {
   }
 
   updateUser(id, name, email, password, age, address, phone) {
-    const user = this.users.find(u => u.id === id);
+    const user = this.users.find((u) => u.id === id);
     if (user) {
       user.name = name;
       user.email = email;
@@ -34,7 +34,7 @@ class UserManager {
   }
 
   deleteUser(id) {
-    this.users = this.users.filter(u => u.id !== id);
+    this.users = this.users.filter((u) => u.id !== id);
   }
 
   // Product management (should be separate)
@@ -45,7 +45,7 @@ class UserManager {
   }
 
   updateProduct(id, name, price, description, category, stock, sku) {
-    const product = this.products.find(p => p.id === id);
+    const product = this.products.find((p) => p.id === id);
     if (product) {
       product.name = name;
       product.price = price;

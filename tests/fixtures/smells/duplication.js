@@ -45,7 +45,7 @@ function processUserData(data) {
       result.push({
         id: data[i].id,
         name: data[i].name,
-        processed: true
+        processed: true,
       });
     }
   }
@@ -59,7 +59,7 @@ function processAdminData(data) {
       result.push({
         id: data[i].id,
         name: data[i].name,
-        processed: true
+        processed: true,
       });
     }
   }
@@ -71,7 +71,7 @@ function calculateUserDiscount(total) {
   if (total > 1000) {
     return total * 0.15;
   } else if (total > 500) {
-    return total * 0.10;
+    return total * 0.1;
   } else if (total > 100) {
     return total * 0.05;
   }
@@ -82,7 +82,7 @@ function calculateVIPDiscount(total) {
   if (total > 1000) {
     return total * 0.15;
   } else if (total > 500) {
-    return total * 0.10;
+    return total * 0.1;
   } else if (total > 100) {
     return total * 0.05;
   }
@@ -95,5 +95,5 @@ module.exports = {
   processUserData,
   processAdminData,
   calculateUserDiscount,
-  calculateVIPDiscount
+  calculateVIPDiscount,
 };

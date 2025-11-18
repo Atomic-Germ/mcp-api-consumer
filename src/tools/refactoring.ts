@@ -3,6 +3,19 @@ import { RefactoringAnalyzer } from '../analyzers/refactoring-analyzer';
 import * as fs from 'fs';
 import * as path from 'path';
 
+interface RefactoringOpportunity {
+  type: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+  location: {
+    file: string;
+    line?: number;
+  };
+  suggestion: string;
+  impact: string;
+  example?: string;
+}
+
 /**
  * Refactoring Suggester - Provides AI-powered refactoring recommendations
  */
@@ -16,18 +29,16 @@ export class RefactoringSuggester {
   /**
    * Analyze a file or directory for refactoring opportunities
    */
-  async analyze(
-    filePath: string,
-    options: { focusArea?: string } = {}
-  ): Promise<AnalysisResult> {
+  async analyze(filePath: string, options: { focusArea?: string } = {}): Promise<AnalysisResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
-    const focusArea = (options.focusArea || 'all') as
-      | 'performance'
-      | 'maintainability'
-      | 'readability'
-      | 'all';
+    // Normalize focusArea with fallback to 'all' for invalid values
+    const focusArea = (
+      ['performance', 'maintainability', 'readability', 'all'].includes(options.focusArea || '')
+        ? options.focusArea
+        : 'all'
+    ) as 'performance' | 'maintainability' | 'readability' | 'all';
     let filesAnalyzed = 0;
 
     try {
@@ -42,7 +53,7 @@ export class RefactoringSuggester {
       }
 
       // Analyze each file
-      const allOpportunities: any[] = [];
+      const allOpportunities: RefactoringOpportunity[] = [];
       for (const file of files) {
         if (!file.match(/\.(ts|js|tsx|jsx)$/)) {
           continue;
@@ -57,7 +68,8 @@ export class RefactoringSuggester {
           // Create finding
           findings.push({
             type: opp.type,
-            severity: opp.priority === 'high' ? 'high' : opp.priority === 'medium' ? 'medium' : 'low',
+            severity:
+              opp.priority === 'high' ? 'high' : opp.priority === 'medium' ? 'medium' : 'low',
             location: opp.location,
             message: opp.description,
             code: opp.type,
@@ -148,7 +160,7 @@ export class RefactoringSuggester {
     }
   }
 
-  private groupByType(opportunities: any[]): Record<string, number> {
+  private groupByType(opportunities: RefactoringOpportunity[]): Record<string, number> {
     const groups: Record<string, number> = {};
 
     opportunities.forEach((opp) => {
@@ -158,7 +170,7 @@ export class RefactoringSuggester {
     return groups;
   }
 
-  private generateSummary(opportunities: any[], focusArea: string): string {
+  private generateSummary(opportunities: RefactoringOpportunity[], focusArea: string): string {
     if (opportunities.length === 0) {
       return `Refactoring analysis complete (focus: ${focusArea}). No refactoring opportunities identified. Code is well-structured!`;
     }

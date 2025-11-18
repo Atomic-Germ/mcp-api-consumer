@@ -5,20 +5,21 @@ class EventManager {
   constructor() {
     this.listeners = [];
   }
-  
+
   addListener(element, event, callback) {
     element.addEventListener(event, callback);
     // Never removed - memory leak!
     this.listeners.push({ element, event, callback });
   }
-  
+
   // Missing cleanup method
 }
 
 // Pattern 2: Closure capturing large objects
 function createProcessor() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const hugeData = new Array(1000000).fill('data');
-  
+
   return function process(item) {
     // Closure keeps hugeData in memory even if not used
     return item.toUpperCase();
@@ -35,7 +36,9 @@ function removeNode(node) {
 
 // Pattern 4: Timer not cleared
 function startPolling() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const intervalId = setInterval(() => {
+    // eslint-disable-next-line no-console
     console.log('Polling...');
   }, 1000);
   // intervalId never cleared - memory leak!
@@ -52,11 +55,11 @@ function cacheData(key, value) {
 function createCircular() {
   const obj1 = { name: 'obj1' };
   const obj2 = { name: 'obj2' };
-  
+
   obj1.ref = obj2;
   obj2.ref = obj1;
   // Circular reference can cause issues
-  
+
   return obj1;
 }
 
@@ -66,5 +69,5 @@ module.exports = {
   removeNode,
   startPolling,
   cacheData,
-  createCircular
+  createCircular,
 };

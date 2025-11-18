@@ -1,7 +1,7 @@
 // Test fixture: Example with slow nested loops
 function processData(data) {
   const result = [];
-  
+
   // Nested loops - O(n^3) complexity
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < data.length; j++) {
@@ -10,15 +10,15 @@ function processData(data) {
       }
     }
   }
-  
+
   return result;
 }
 
 // Inefficient array operations
 function filterAndMap(items) {
   // Multiple iterations over same array
-  const filtered = items.filter(x => x > 0);
-  const doubled = filtered.map(x => x * 2);
+  const filtered = items.filter((x) => x > 0);
+  const doubled = filtered.map((x) => x * 2);
   const sorted = doubled.sort((a, b) => a - b);
   return sorted;
 }
