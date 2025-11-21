@@ -1,11 +1,11 @@
 {
-  "name": "mcp-optimist",
+  "name": "mcp-api-consumer",
   "version": "0.1.0",
-  "description": "An intelligent code optimization MCP server that analyzes and improves codebases",
+  "description": "A comprehensive MCP server for consuming, testing, and documenting REST APIs with TDD workflow support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "mcp-optimist": "dist/index.js"
+    "mcp-api-consumer": "dist/index.js"
   },
   "scripts": {
     "clean": "npx rimraf dist/ node_modules/",
@@ -28,23 +28,27 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "code-optimization",
-    "static-analysis",
-    "performance",
-    "code-quality",
-    "refactoring",
-    "tdd"
+    "api-testing",
+    "rest-api",
+    "openapi",
+    "swagger",
+    "api-consumer",
+    "http-client",
+    "load-testing",
+    "api-documentation",
+    "tdd",
+    "orchestration"
   ],
   "author": "Your Name",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/mcp-optimist.git"
+    "url": "https://github.com/yourusername/mcp-api-consumer.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/mcp-optimist/issues"
+    "url": "https://github.com/yourusername/mcp-api-consumer/issues"
   },
-  "homepage": "https://github.com/yourusername/mcp-optimist#readme",
+  "homepage": "https://github.com/yourusername/mcp-api-consumer#readme",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -53,6 +57,11 @@
     "@babel/parser": "^7.23.6",
     "@babel/traverse": "^7.23.6",
     "@babel/types": "^7.23.6",
+    "axios": "^1.6.5",
+    "openapi-types": "^12.1.3",
+    "swagger-parser": "^10.0.3",
+    "yaml": "^2.3.4",
+    "ajv": "^8.12.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

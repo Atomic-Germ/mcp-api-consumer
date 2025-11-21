@@ -1,26 +1,25 @@
-import { OptimistConfig, ServerInfo, Tool } from './types';
+import { APIConsumerConfig, ServerInfo, Tool } from './types';
 
 /**
- * Default configuration for Optimist server
+ * Default configuration for API Consumer server
  */
-const DEFAULT_CONFIG: Required<OptimistConfig> = {
-  maxComplexity: 10,
-  analysisDepth: 'medium',
-  ignorePatterns: ['**/node_modules/**', '**/dist/**', '**/coverage/**'],
-  fileExtensions: ['.js', '.ts', '.jsx', '.tsx'],
-  enabledTools: 'all',
+const DEFAULT_CONFIG: Required<APIConsumerConfig> = {
+  timeout: 30000,
+  maxConcurrentRequests: 10,
+  enableMockServer: true,
+  testFrameworks: ['jest', 'vitest', 'mocha'],
 };
 
 /**
- * OptimistServer - Main MCP server implementation
+ * APIConsumerServer - Main MCP server implementation
  */
-export class OptimistServer {
-  public readonly name = 'optimist';
+export class APIConsumerServer {
+  public readonly name = 'api-consumer';
   public readonly version = '0.1.0';
   private readonly protocolVersion = '2024-11-05';
-  public readonly config: Required<OptimistConfig>;
+  public readonly config: Required<APIConsumerConfig>;
 
-  constructor(config: OptimistConfig = {}) {
+  constructor(config: APIConsumerConfig = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
@@ -41,136 +40,195 @@ export class OptimistServer {
   listTools(): Tool[] {
     const tools: Tool[] = [
       {
-        name: 'analyze_performance',
-        description: 'Analyze code performance and identify bottlenecks',
+        name: 'create_request',
+        description: 'Create an HTTP request configuration',
         inputSchema: {
           type: 'object',
           properties: {
-            path: { type: 'string', description: 'Directory or file path to analyze' },
-            includeTests: { type: 'boolean', description: 'Include test files', default: false },
-            threshold: {
+            method: {
               type: 'string',
-              enum: ['low', 'medium', 'high'],
-              description: 'Alert threshold',
-              default: 'medium',
+              enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+              description: 'HTTP method',
+            },
+            url: { type: 'string', description: 'Request URL' },
+            headers: {
+              type: 'object',
+              description: 'Request headers',
+              additionalProperties: { type: 'string' },
+            },
+            params: {
+              type: 'object',
+              description: 'Query parameters',
+            },
+            data: {
+              description: 'Request body data',
+            },
+            timeout: {
+              type: 'number',
+              description: 'Request timeout in milliseconds',
+              default: 30000,
             },
           },
-          required: ['path'],
+          required: ['method', 'url'],
         },
       },
       {
-        name: 'optimize_memory',
-        description: 'Detect memory leaks and suggest memory-efficient patterns',
+        name: 'execute_request',
+        description: 'Execute an HTTP request and return the response',
         inputSchema: {
           type: 'object',
           properties: {
-            path: { type: 'string', description: 'Directory or file path to analyze' },
-            detectLeaks: { type: 'boolean', description: 'Check for memory leaks', default: true },
-            suggestFixes: {
-              type: 'boolean',
-              description: 'Provide fix suggestions',
-              default: true,
+            request: {
+              type: 'object',
+              description: 'Request configuration (from create_request)',
             },
           },
-          required: ['path'],
+          required: ['request'],
         },
       },
       {
-        name: 'analyze_complexity',
-        description: 'Evaluate cyclomatic and cognitive complexity',
+        name: 'import_openapi',
+        description: 'Import and parse OpenAPI/Swagger specification',
         inputSchema: {
           type: 'object',
           properties: {
-            path: { type: 'string', description: 'Directory or file path to analyze' },
-            maxComplexity: { type: 'number', description: 'Maximum allowed complexity' },
-            reportFormat: {
+            source: {
               type: 'string',
-              enum: ['summary', 'detailed', 'json'],
-              default: 'summary',
+              description: 'File path or URL to OpenAPI specification',
             },
-          },
-          required: ['path'],
-        },
-      },
-      {
-        name: 'detect_code_smells',
-        description: 'Identify anti-patterns and code quality issues',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            path: { type: 'string', description: 'Directory or file path to analyze' },
-            severity: {
+            sourceType: {
               type: 'string',
-              enum: ['low', 'medium', 'high', 'critical'],
-              description: 'Minimum severity to report',
+              enum: ['file', 'url'],
+              description: 'Type of source',
+              default: 'file',
             },
           },
-          required: ['path'],
+          required: ['source'],
         },
       },
       {
-        name: 'analyze_dependencies',
-        description: 'Map and analyze dependency graphs',
+        name: 'generate_test_suite',
+        description: 'Generate test cases from OpenAPI specification',
         inputSchema: {
           type: 'object',
           properties: {
-            path: { type: 'string', description: 'Project root path' },
-            checkCircular: {
-              type: 'boolean',
-              description: 'Detect circular dependencies',
-              default: true,
+            specification: {
+              type: 'object',
+              description: 'Parsed OpenAPI specification',
             },
-            suggestUpdates: {
+            framework: {
+              type: 'string',
+              enum: ['jest', 'vitest', 'mocha'],
+              description: 'Test framework',
+              default: 'jest',
+            },
+            coverage: {
+              type: 'string',
+              enum: ['basic', 'comprehensive', 'exhaustive'],
+              description: 'Test coverage level',
+              default: 'comprehensive',
+            },
+          },
+          required: ['specification'],
+        },
+      },
+      {
+        name: 'execute_test_workflow',
+        description: 'Execute a test workflow with orchestration',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            workflow: {
+              type: 'string',
+              description: 'Workflow ID or name',
+            },
+            endpoints: {
+              type: 'array',
+              description: 'Endpoints to test',
+              items: { type: 'object' },
+            },
+            environment: {
+              type: 'object',
+              description: 'Test environment configuration',
+            },
+            parallel: {
               type: 'boolean',
-              description: 'Suggest dependency updates',
+              description: 'Run tests in parallel',
               default: false,
             },
           },
-          required: ['path'],
+          required: ['workflow', 'endpoints'],
         },
       },
       {
-        name: 'find_dead_code',
-        description: 'Identify and locate unused code',
+        name: 'validate_response',
+        description: 'Validate API response against expected schema',
         inputSchema: {
           type: 'object',
           properties: {
-            path: { type: 'string', description: 'Directory or file path to analyze' },
-            includeUnusedExports: {
-              type: 'boolean',
-              description: 'Include unused exports',
-              default: true,
+            response: {
+              type: 'object',
+              description: 'Actual API response',
+            },
+            expectedSchema: {
+              type: 'object',
+              description: 'Expected response schema',
+            },
+            assertions: {
+              type: 'array',
+              description: 'Additional assertions to perform',
+              items: { type: 'object' },
             },
           },
-          required: ['path'],
+          required: ['response', 'expectedSchema'],
         },
       },
       {
-        name: 'optimize_hot_paths',
-        description: 'Analyze and optimize frequently executed code paths',
+        name: 'create_mock_server',
+        description: 'Create a mock API server from specification',
         inputSchema: {
           type: 'object',
           properties: {
-            path: { type: 'string', description: 'Directory or file path to analyze' },
-            profilingData: { type: 'string', description: 'Path to profiling data (optional)' },
-          },
-          required: ['path'],
-        },
-      },
-      {
-        name: 'suggest_refactoring',
-        description: 'Provide AI-powered refactoring recommendations',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            path: { type: 'string', description: 'Directory or file path to analyze' },
-            focusArea: {
-              type: 'string',
-              enum: ['performance', 'maintainability', 'readability', 'all'],
-              default: 'all',
+            specification: {
+              type: 'object',
+              description: 'OpenAPI specification',
+            },
+            port: {
+              type: 'number',
+              description: 'Port for mock server',
+              default: 3000,
+            },
+            responseDelay: {
+              type: 'number',
+              description: 'Simulated response delay in ms',
+              default: 0,
             },
           },
-          required: ['path'],
+          required: ['specification'],
+        },
+      },
+      {
+        name: 'analyze_performance',
+        description: 'Analyze API performance and response times',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            endpoint: {
+              type: 'object',
+              description: 'Endpoint to analyze',
+            },
+            iterations: {
+              type: 'number',
+              description: 'Number of test iterations',
+              default: 100,
+            },
+            concurrency: {
+              type: 'number',
+              description: 'Concurrent requests',
+              default: 10,
+            },
+          },
+          required: ['endpoint'],
         },
       },
     ];

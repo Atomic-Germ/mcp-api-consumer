@@ -3,28 +3,21 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { OptimistServer } from './server.js';
-import { PerformanceAnalyzer } from './tools/performance.js';
-import { MemoryOptimizer } from './tools/memory.js';
-import { ComplexityAnalyzer } from './tools/complexity.js';
-import { CodeSmellDetector } from './tools/code-smells.js';
-import { RefactoringSuggester } from './tools/refactoring.js';
+import { APIConsumerServer } from './server.js';
+import { createRequest, executeRequest } from './tools/http-request.js';
+import { OpenAPIImporter } from './tools/openapi-importer.js';
 
 /**
- * Main entry point for the Optimist MCP server
+ * Main entry point for the API Consumer MCP server
  */
 async function main() {
-  const optimist = new OptimistServer();
-  const performanceAnalyzer = new PerformanceAnalyzer();
-  const memoryOptimizer = new MemoryOptimizer();
-  const complexityAnalyzer = new ComplexityAnalyzer();
-  const codeSmellDetector = new CodeSmellDetector();
-  const refactoringSuggester = new RefactoringSuggester();
+  const apiConsumer = new APIConsumerServer();
+  const openApiImporter = new OpenAPIImporter();
 
   const server = new Server(
     {
-      name: optimist.name,
-      version: optimist.version,
+      name: apiConsumer.name,
+      version: apiConsumer.version,
     },
     {
       capabilities: {
@@ -35,7 +28,7 @@ async function main() {
 
   // Handle list_tools request
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    const tools = optimist.listTools();
+    const tools = apiConsumer.listTools();
     return { tools };
   });
 
@@ -45,103 +38,63 @@ async function main() {
 
     try {
       switch (name) {
+        case 'create_request': {
+          const config = args as any;
+          const requestConfig = createRequest(config);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(requestConfig, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'execute_request': {
+          const { request: requestConfig } = args as any;
+          if (!requestConfig) {
+            throw new Error('Missing required argument: request');
+          }
+          const response = await executeRequest(requestConfig);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(response, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'import_openapi': {
+          const { source, sourceType } = args as any;
+          if (!source) {
+            throw new Error('Missing required argument: source');
+          }
+
+          let spec;
+          if (sourceType === 'url') {
+            spec = await openApiImporter.importFromUrl(source);
+          } else {
+            spec = await openApiImporter.importFromFile(source);
+          }
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(spec, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'generate_test_suite':
+        case 'execute_test_workflow':
+        case 'validate_response':
+        case 'create_mock_server':
         case 'analyze_performance': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const result = await performanceAnalyzer.analyze(path);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'optimize_memory': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            detectLeaks: (args as any).detectLeaks,
-            suggestFixes: (args as any).suggestFixes,
-          };
-          const result = await memoryOptimizer.analyze(path, options);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'analyze_complexity': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            maxComplexity: (args as any).maxComplexity,
-            reportFormat: (args as any).reportFormat,
-          };
-          const result = await complexityAnalyzer.analyze(path, options);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'detect_code_smells': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            severity: (args as any).severity,
-          };
-          const result = await codeSmellDetector.analyze(path, options);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'suggest_refactoring': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            focusArea: (args as any).focusArea,
-          };
-          const result = await refactoringSuggester.analyze(path, options);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
-          };
-        }
-
-        case 'analyze_dependencies':
-        case 'find_dead_code':
-        case 'optimize_hot_paths': {
           return {
             content: [
               {
@@ -157,9 +110,10 @@ async function main() {
             content: [
               {
                 type: 'text',
-                text: `Tool '${name}' implementation pending. Arguments received: ${JSON.stringify(args, null, 2)}`,
+                text: `Unknown tool: '${name}'`,
               },
             ],
+            isError: true,
           };
         }
       }
@@ -181,7 +135,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error('Optimist MCP server running on stdio');
+  console.error('API Consumer MCP server running on stdio');
 }
 
 main().catch((error) => {
